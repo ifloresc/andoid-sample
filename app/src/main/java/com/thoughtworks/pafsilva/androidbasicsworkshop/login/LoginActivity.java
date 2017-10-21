@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.mobilemock.uat.lan.com/ws/api/mobilemocks/v1/mock/ws/api/")
+                .baseUrl("http://www.mobilemock.uat.lan.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();

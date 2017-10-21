@@ -8,6 +8,6 @@ import retrofit2.http.Query;
 
 public interface LoginEndpoints {
 
-    @GET("/login")
+    @GET("ws/api/mobilemocks/v1/mock/ws/api/login")
     Call<UserInfo> getUser(@Query("username") String email, @Query("password") String password);
 }
