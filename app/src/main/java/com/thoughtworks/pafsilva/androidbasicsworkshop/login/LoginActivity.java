@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.thoughtworks.pafsilva.androidbasicsworkshop.R;
 import com.thoughtworks.pafsilva.androidbasicsworkshop.login.service.LoginEndpoints;
@@ -69,8 +70,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        Intent navigationIntent = new Intent(this, UserDetailsActivity.class);
-        startActivity(navigationIntent);
+        callLoginService();
     }
 
     private void callLoginService() {
@@ -81,19 +81,26 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("url")
+                .baseUrl("http://www.mobilemock.uat.lan.com/ws/api/mobilemocks/v1/mock/ws/api/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build();
 
         LoginEndpoints APIEndpoints = retrofit.create(LoginEndpoints.class);
-        Call<UserInfo> userInfoCall = APIEndpoints.getUser("email", "pass");
+        Call<UserInfo> userInfoCall = APIEndpoints.getUser("goku", "123456");
 
         userInfoCall.enqueue(new Callback<UserInfo>() {
 
             @Override
             public void onResponse(@NonNull Call<UserInfo> call, @NonNull Response<UserInfo> response) {
                 //On Sucess
+
+                if (response.code() == 200) {
+                    Intent navigationIntent = new Intent(LoginActivity.this, UserDetailsActivity.class);
+                    startActivity(navigationIntent);
+                } else {
+                    Toast.makeText(LoginActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
