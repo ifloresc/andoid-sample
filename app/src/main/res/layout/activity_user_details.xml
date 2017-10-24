@@ -8,11 +8,27 @@
     tools:context="com.thoughtworks.pafsilva.androidbasicsworkshop.userdetails.UserDetailsActivity">
 
     <TextView
+        android:id="@+id/textInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="22sp"
         android:gravity="center"
         android:padding="16dp"
         tools:text="Welcome Goku"/>
+
+    <TextView
+        android:id="@+id/textPoint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:padding="16dp"
+        tools:text="Points"/>
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" />
 
 </LinearLayout>

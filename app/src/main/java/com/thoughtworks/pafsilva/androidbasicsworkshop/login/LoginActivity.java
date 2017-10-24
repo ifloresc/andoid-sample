@@ -1,5 +1,6 @@
 package com.thoughtworks.pafsilva.androidbasicsworkshop.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.thoughtworks.pafsilva.androidbasicsworkshop.R;
@@ -27,6 +29,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private Button btnLogin;
 
+    private EditText edtEmail;
+
+    private EditText edtPassword;
+
+    private Call<UserInfo> userInfoCall;
+
+    private ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +46,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         btnLogin = (Button) findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
+
+        edtEmail = (EditText) findViewById(R.id.edtEmail);
+        edtPassword = (EditText) findViewById(R.id.edtPassword);
     }
 
     @Override
@@ -54,6 +67,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onPause() {
         super.onPause();
         Log.d("LoginActivity Lifecycle", "onPause");
+        if (userInfoCall.isExecuted()) {
+            userInfoCall.cancel();
+            Toast.makeText(LoginActivity.this, "Cancelamos Ejecucion", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -70,10 +88,24 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-        callLoginService();
+
+        String email = edtEmail.getText().toString();
+        String password = edtPassword.getText().toString();
+
+        if (email.trim().length() != 0 || password.trim().length() != 0) {
+            progressDialog = new ProgressDialog(this);
+            progressDialog.setMax(100);
+            progressDialog.setMessage("Scaneando el Ki  ....");
+            progressDialog.setTitle("Verificando KI");
+            progressDialog.show();
+
+            callLoginService(email, password);
+        } else {
+            Toast.makeText(LoginActivity.this, "Se deben ingresar los valores", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void callLoginService() {
+    private void callLoginService(String email, String password) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .readTimeout(15, TimeUnit.SECONDS)
                 .connectTimeout(15, TimeUnit.SECONDS)
@@ -87,7 +119,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .build();
 
         LoginEndpoints APIEndpoints = retrofit.create(LoginEndpoints.class);
-        Call<UserInfo> userInfoCall = APIEndpoints.getUser("goku", "123456");
+        userInfoCall = APIEndpoints.getUser(email, password);
 
         userInfoCall.enqueue(new Callback<UserInfo>() {
 
@@ -96,8 +128,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 //On Sucess
 
                 if (response.code() == 200) {
+
                     Intent navigationIntent = new Intent(LoginActivity.this, UserDetailsActivity.class);
+                    navigationIntent.putExtra("user", response.body());
                     startActivity(navigationIntent);
+
+                    progressDialog.dismiss();
                 } else {
                     Toast.makeText(LoginActivity.this, "Error", Toast.LENGTH_SHORT).show();
                 }
@@ -105,7 +141,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(@NonNull Call<UserInfo> call, @NonNull Throwable t) {
-                //On Failure
+                Toast.makeText(LoginActivity.this, "Error al Llamar Servicio", Toast.LENGTH_SHORT).show();
             }
         });
     }

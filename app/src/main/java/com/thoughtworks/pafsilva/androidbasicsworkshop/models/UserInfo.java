@@ -1,6 +1,9 @@
 package com.thoughtworks.pafsilva.androidbasicsworkshop.models;
 
-public class UserInfo {
+import java.io.Serializable;
+
+public class UserInfo implements Serializable {
+
     private String firstName;
     private String lastName;
     private String category;
